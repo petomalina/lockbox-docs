@@ -1,0 +1,344 @@
+openapi: 3.0.0
+info:
+  title: Lockbox API
+  description: API for managing roles, permissions, and bindings for different identities.
+  version: 1.0.0
+
+servers:
+  - url: https://api.accessbox.dev/v1
+
+tags:
+  - name: Authorization API
+    description: Operations related to authorization
+  - name: Management API
+    description: Operations related to management of roles, permissions, and bindings
+  
+paths:
+  /authorize:
+    post:
+      summary: Authorize
+      tags:
+        - Authorization API
+      parameters:
+        - name: tenant
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: explain
+          in: query
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizeRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorizeResponse'
+      security:
+        - BearerAuth: []
+
+  /debug:
+    post:
+      summary: Debug
+      tags:
+        - Authorization API
+      parameters:
+        - name: tenant
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DebugRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebugResponse'
+      security:
+        - BearerAuth: []
+
+  /bindings:
+    post:
+      summary: Create a binding
+      tags:
+        - Management API
+      parameters:
+        - name: tenant
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindingRequest'
+      responses:
+        '200':
+          description: Successful response
+      security:
+        - BearerAuth: []
+    delete:
+      summary: Delete a binding
+      tags:
+        - Management API
+      parameters:
+        - name: tenant
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BindingRequest'
+      responses:
+        '200':
+          description: Successful response
+
+  /identities:
+    get:
+      summary: List identities that have access to a provided resource
+      tags:
+        - Management API
+      parameters:
+        - name: tenant
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: resource
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentitiesResponse'
+      security:
+        - BearerAuth: []
+
+  /resources:
+    get:
+      summary: List resources that a provided identity has access to
+      tags:
+        - Management API
+      parameters:
+        - name: tenant
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: identity
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourcesResponse'
+      security:
+        - BearerAuth: []
+
+  /roles:
+    get:
+      summary: Get roles
+      tags:
+        - Management API
+      parameters:
+        - name: tenant
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolesResponse'
+      security:
+        - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    BindingRequest:
+      type: object
+      properties:
+        identity:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        resource:
+          type: string
+      required:
+        - identity
+        - roles
+        - resource
+
+    IdentitiesResponse:
+      type: object
+      properties:
+        identities:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Identity'
+
+    Identity:
+      type: object
+      properties:
+        bindingId:
+          type: string
+        resource:
+          type: string
+        roles:
+          type: object
+          additionalProperties:
+            type: string
+
+    ResourcesResponse:
+      type: object
+      properties:
+        resources:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Resource'
+
+    Resource:
+      type: object
+      properties:
+        resource:
+          type: string
+        roles:
+          type: object
+          additionalProperties:
+            type: string
+
+    RolesResponse:
+      type: object
+      properties:
+        roles:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/Role'
+
+    Role:
+      type: object
+      properties:
+        active:
+          type: boolean
+        bindings:
+          type: integer
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+
+    AuthorizeRequest:
+      type: object
+      properties:
+        identity:
+          type: string
+        permission:
+          type: string
+        resource:
+          type: string
+      required:
+        - identity
+        - permission
+        - resource
+
+    AuthorizeResponse:
+      type: object
+      properties:
+        allow:
+          type: boolean
+
+    DebugRequest:
+      type: object
+      properties:
+        identity:
+          type: string
+        permission:
+          type: string
+        resource:
+          type: string
+      required:
+        - identity
+        - permission
+        - resource
+
+    DebugResponse:
+      type: object
+      properties:
+        debug:
+          type: object
+          properties:
+            allow:
+              type: boolean
+            input:
+              type: object
+              properties:
+                identity:
+                  type: string
+                permission:
+                  type: string
+                resource:
+                  type: string
+                tenant:
+                  type: string
+            match:
+              type: array
+              items:
+                type: object
+                properties:
+                  binding:
+                    type: object
+                    properties:
+                      resource:
+                        type: string
+                      roles:
+                        type: object
+                        additionalProperties:
+                          type: string
+                  matchedRole:
+                    type: string
+                  type:
+                    type: string
