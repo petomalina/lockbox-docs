@@ -2,4 +2,4 @@
 sidebar_position: 2
 ---
 
-# Bindings
+# Working with Bindings

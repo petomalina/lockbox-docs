@@ -1,0 +1,53 @@
+---
+sidebar_position: 1
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# Designing Authorization
+
+This guide will walk you through the core concepts of Lockbox, using a Todolist tracker as an example.
+Imagine you're a freelancer managing multiple projects with tasks, and invoices. Each project
+belongs to an account (personal or organizational). Let's explore how Lockbox helps you control access to these resources.
+
+## Understanding the Resource Structure
+
+Resources are composed in a tree structure. In our Todolist tracker, the root resource is the account.
+Each account can have multiple projects. Each project can have multiple tasks and invoices. This tree structure 
+allows for granular control over the permissions without the need to define permissions for each individual resource.
+
+<img src={useBaseUrl('/img/resource-structure.png')} width="600" />
+
+In the example above, a path to e.g. Task-1 would be `/accounts/account-1/projects/project-1/tasks/task-1`. 
+
+## Roles & Permissions
+
+In Lockbox, roles are a collection of permissions. We define roles for different resources using flat strings
+containing the resource name and the permission. For example, a role for an account owner might look like
+this: `accounts.owner`. For the projects, even though they are part of some account, we define such role as
+e.g. `projects.owner`. This allows us to bind the role to any resource in the resource tree.
+
+Each role can have multiple permissions. For example, the `projects.owner` might look like this:
+- `projects.read`
+- `projects.write`
+- `tasks.read`
+- `tasks.write`
+- `invoices.read`
+- `invoices.write`
+
+Other roles, such as `projects.viewer`, might only have the `projects.read` and `tasks.read` permission. You can then bind this role to the whole account or to a specific project.
+
+## Identities
+
+Identities within Lockbox are just strings with metadata. They can be anything from an email address to a UUID.
+In our Todolist tracker, we can use email addresses as identities for people, and API key UUIDs as identities
+for automation.
+
+## Bindings
+
+Binding is a unique triad of an identity, a resource, and roles. Bindings then define who can perform what actions
+on a given resource and all its children. For example, you can bind the `projects.owner` role to the `/accounts/account-1`
+resource for the identity `john@example.com` and this identity will have the permissions to read and write to all projects within the account.
+
+You can translate each binding to a simple sentence: "John can read and write to all projects in account-1", or more precisely,
+"john@example.com has the `projects.read` and `projects.write` permissions on the `/accounts/account-1` resource".
