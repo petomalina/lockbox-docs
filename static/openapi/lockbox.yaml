@@ -113,6 +113,8 @@ paths:
       responses:
         '200':
           description: Successful response
+      security:
+        - BearerAuth: []
 
   /identities:
     get:
