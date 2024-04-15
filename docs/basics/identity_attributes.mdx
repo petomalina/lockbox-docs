@@ -1,0 +1,39 @@
+---
+sidebar_position: 3
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# Identity Attributes
+
+:::info
+
+This feature is currently in private beta. If you are interested in trying it out, please contact us.
+
+:::
+
+Identity attributes allow you to assign attributes to identities. This is useful when you want
+to define roles for a group of identities, or when you want to assign additional metadata to an identity.
+
+## Attributes
+
+Attributes are key-value pairs that you can assign to an identity. For example, you can assign an attribute
+`department: engineering` to an identity `john@example.com`. This attribute can then be used to define roles for all
+identities with the `department: engineering` attribute.
+
+## Dynamic Bindings
+
+Dynamic bindings are bindings that are created based on the attributes of an identity. For example, you can create a
+dynamic binding that assigns the `projects.owner` role on a resource path `/accounts/account-1/projects` to all
+identities with the `department: engineering` attribute.
+
+This allows you to define roles for groups of identities based on their attributes, without the need to create bindings
+for each individual identity. This is especially useful when you have a large number of identities and want to manage
+roles for groups of identities efficiently.
+
+## Use Cases
+
+Here are some common use cases for identity attributes:
+- Assign roles to **groups of identities** based on attributes such as department, team, or location.
+- Assign additional metadata to an identity, such as incident management schedule.
+- Define roles for identities based on their attributes, without the need to create bindings for each individual identity.

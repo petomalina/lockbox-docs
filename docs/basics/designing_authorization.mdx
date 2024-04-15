@@ -18,7 +18,8 @@ allows for granular control over the permissions without the need to define perm
 
 <img src={useBaseUrl('/img/resource-structure.png')} width="600" />
 
-In the example above, a path to e.g. Task-1 would be `/accounts/account-1/projects/project-1/tasks/task-1`. 
+In the example above, a path to e.g. Task-1 would be `/accounts/account-1/projects/project-1/tasks/task-1`. If you want to
+reference all projects, for the account, you can use `/accounts/account-1/projects`, etc.
 
 ## Roles & Permissions
 
@@ -49,5 +50,6 @@ Binding is a unique triad of an identity, a resource, and roles. Bindings then d
 on a given resource and all its children. For example, you can bind the `projects.owner` role to the `/accounts/account-1`
 resource for the identity `john@example.com` and this identity will have the permissions to read and write to all projects within the account.
 
-You can translate each binding to a simple sentence: "John can read and write to all projects in account-1", or more precisely,
-"john@example.com has the `projects.read` and `projects.write` permissions on the `/accounts/account-1` resource".
+You can translate each binding to a simple sentence: "John is an owner of all projects in account-1", or more precisely,
+"john@example.com has the `projects.owner` role on the `/accounts/account-1` resource". Since AccessBox inherits the roles
+to all children resources, John will have the `projects.owner` role on sub-resources of the `account-1`.
