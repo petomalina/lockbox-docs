@@ -1,0 +1,213 @@
+---
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# Quickstart
+
+This guide will walk you through the basic steps of setting up an authorization system using AccessBox.
+
+## Step 1: Define Roles and Permissions
+
+1. **Access the AccessBox UI and navigate to the "Roles" section.** 
+2. **Create two roles:**
+    * **`projects.owner`**: Assign the permissions `projects.read` and `projects.write`.
+    * **`projects.viewer`**: Assign the permission `projects.read`. 
+
+<img src={useBaseUrl('/img/new-role.png')} width="600" />
+
+## Step 2: Create an API Key
+
+1. **Make note of your tenant ID**
+    <img src={useBaseUrl('/img/tenant-location.png')} width="400" />
+
+2. **In the AccessBox UI, go to the "API Keys" section and create a new API key.**
+    <img src={useBaseUrl('/img/new-api-key.png')} width="600" />
+
+3. **Set these values as environment variables in your shell:**
+
+```shell
+export ACCESSBOX_API_KEY="your_api_key"
+export ACCESSBOX_TENANT="your_tenant_id"
+```
+
+## Step 3: Create Bindings
+
+Bindings are a triad of an identity (defined by a string), a resource (also defined by a string), and a role. Resources are defined within a tree structure, e.g. `/projects/project-1`, where `/projects` is a collection and `project-1` is a specific object.
+
+<Tabs>
+  <TabItem value="Console" label="Console" default>
+    1. **Go to the "Bindings" section in the AccessBox UI.**
+    2. **Create a binding for `john@example.com` with the role `projects.owner` on the resource `/projects/project-1`.**
+    3. **Create another binding for `bob@example.com` with the role `projects.viewer` on the same resource.**
+  </TabItem>
+  <TabItem value="cURL" label="cURL">
+    First, create a bindiding for john the owner of the project.
+
+    ```bash
+    curl --request POST \
+      --url "https://api.accessbox.dev/v1/bindings?tenant=$ACCESSBOX_TENANT" \
+      --header "Authorization: Bearer $ACCESSBOX_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --data '{
+      "identity": "john@example.com",
+      "roles": ["projects.owner"],
+      "resource": "/projects/project-1"
+    }'
+    ```
+
+    Next, create a binding for bob the viewer of the project.
+
+    ```bash
+    curl --request POST \
+      --url "https://api.accessbox.dev/v1/bindings?tenant=$ACCESSBOX_TENANT" \
+      --header "Authorization: Bearer $ACCESSBOX_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --data '{
+      "identity": "bob@example.com",
+      "roles": ["projects.viewer"],
+      "resource": "/projects/project-1"
+    }'
+    ```
+  </TabItem>
+
+  <TabItem value="JavaScript" label="JavaScript">
+    ```javascript
+    const axios = require('axios');
+
+    // Set the API endpoint and authentication headers
+    const url = `https://api.accessbox.dev/v1/bindings?tenant=${process.env.ACCESSBOX_TENANT}`;
+    const headers = {
+      'Authorization': `Bearer ${process.env.ACCESSBOX_API_KEY}`,
+      'Content-Type': 'application/json',
+    };
+
+    async function createBinding(url, headers, data) {
+      try {
+        const response = await axios.post(url, data, { headers });
+        console.log('Binding created with status:', response.status);
+      } catch (error) {
+        console.error('Error creating binding:', error);
+      }
+    }
+
+    // Create a binding for john@example.com
+    const johnBinding = {
+      identity: 'john@example.com',
+      roles: ['projects.owner'],
+      resource: '/projects/project-1',
+    };
+    createBinding(url, headers, johnBinding);
+
+    // Create a binding for bob@example.com
+    const bobBinding = {
+      identity: 'bob@example.com',
+      roles: ['projects.viewer'],
+      resource: '/projects/project-1',
+    };
+    createBinding(url, headers, bobBinding);
+    ```
+  </TabItem>
+
+  <TabItem value="Go" label="Go">
+  ```go
+  package main
+  
+  import (
+    "bytes"
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "os"
+  )
+
+  func main() {
+    // Set the API endpoint and authentication headers
+    url := "https://api.accessbox.dev/v1/bindings?tenant=" + os.Getenv("ACCESSBOX_TENANT")
+    headers := map[string]string{
+      "Authorization": "Bearer " + os.Getenv("ACCESSBOX_API_KEY"),
+      "Content-Type":  "application/json",
+    }
+
+    // Create a binding for john@example.com
+    johnBinding := map[string]interface{}{
+      "identity": "john@example.com",
+      "roles":    []string{"projects.owner"},
+      "resource": "/projects/project-1",
+    }
+    createBinding(url, headers, johnBinding)
+
+    // Create a binding for bob@example.com
+    bobBinding := map[string]interface{}{
+      "identity": "bob@example.com",
+      "roles":    []string{"projects.viewer"},
+      "resource": "/projects/project-1",
+    }
+    createBinding(url, headers, bobBinding)
+  }
+
+  func createBinding(url string, headers map[string]string, data map[string]interface{}) {
+    jsonData, _ := json.Marshal(data)
+
+    req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+    for key, value := range headers {
+      req.Header.Set(key, value)
+    }
+
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    if err != nil {
+      panic(err)
+    }
+    defer resp.Body.Close()
+
+    fmt.Println("Binding created with status:", resp.Status)
+  }
+  ```
+  </TabItem>
+</Tabs>
+
+## Step 4: Test Authorization
+
+You can now test the authorization system you've set up.
+
+<Tabs>
+  <TabItem value="Console" label="Console" default>
+    1. **Navigate to the "Tests" tab in the UI.**
+    2. **Test scenarios like:**
+    * Can `john@example.com` write to `/projects/project-1`?
+    * Can `bob@example.com` read `/projects/project-1`?
+    * Can `bob@example.com` write to `/projects/project-1`?
+  </TabItem>
+  <TabItem value="cURL" label="cURL">
+    Try changing the identity, permission, or resource to see how the authorization changes.
+
+    ```bash
+    curl --request POST \
+      --url "https://api.accessbox.dev/v1/authorize?tenant=$ACCESSBOX_TENANT" \
+      --header "Authorization: Bearer $ACCESSBOX_API_KEY" \
+      --header 'Content-Type: application/json' \
+      --data '{
+      "identity": "john@example.com",
+      "permission": "projects.write",
+      "resource": "/projects/project-1"
+    }'
+    ```
+  </TabItem>
+  
+  <TabItem value="JavaScript" label="JavaScript">
+  </TabItem>
+
+  <TabItem value="Go" label="Go">
+  </TabItem>
+</Tabs>
+
+## :tada: Congratulations! :tada:
+
+**Congratulations! You've taken your first steps with AccessBox. Happy authorizing!** :tada:
+
+What's next? Check out the [Designing Authorization](/basics/designing_authorization) or [Working with Bindings](/basics/working_with_bindings) sections to learn more about
+the core concepts of AccessBox and integrating it with your application.

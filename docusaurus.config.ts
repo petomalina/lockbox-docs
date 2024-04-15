@@ -89,7 +89,7 @@ const config: Config = {
           items: [
             {
               label: 'Quickstart',
-              to: '/tutorial/quickstart',
+              to: '/quickstart',
             },
           ],
         },
@@ -129,7 +129,7 @@ const config: Config = {
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ['bash'],
+      additionalLanguages: ['bash', 'go', 'python'],
     },
   } satisfies Preset.ThemeConfig,
 };
