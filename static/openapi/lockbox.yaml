@@ -217,20 +217,62 @@ components:
       properties:
         identities:
           type: object
-          additionalProperties:
-            $ref: '#/components/schemas/Identity'
+          additionalProperties: # This allows for a flexible key
+            type: object
+            additionalProperties:
+              type: object
+              properties:
+                bindingId:
+                  type: string
+                  example: "X3fYvVsUOKewcaWVd9jJ"
+                roles:
+                  type: object
+                  additionalProperties:
+                    type: string
+                    example: ""
+      example:
+        "identities": {
+          "bob_auditor": {
+            "/": {
+              "bindingId": "X3fYvVsUOKewcaWVd9jJ",
+              "roles": {
+                "store.supervisor": "",
+                "warehouse.supervisor": ""
+              }
+            }
+          },
+          "frank_brno_store_supervisor": {
+            "/stores/brno": {
+              "bindingId": "7Y2Kd5MF2hmJxdJzq1rF",
+              "roles": {
+                "store.supervisor": ""
+              }
+            }
+          },
+          "joe_stores_supervisor": {
+            "/stores": {
+              "bindingId": "C4JyFU6aP6fiMPIEkjGe",
+              "roles": {
+                "store.supervisor": ""
+              }
+            }
+          },
+          "johnny_brno_cashier": {
+            "/stores": {
+              "bindingId": "dCzV6y1XZWG3F1hw0kel",
+              "roles": {
+                "store.customer": ""
+              }
+            },
+            "/stores/brno": {
+              "bindingId": "6YRTAE6a2muszXFHlrPy",
+              "roles": {
+                "store.cashier": ""
+              }
+            }
+          }
+        }
 
-    Identity:
-      type: object
-      properties:
-        bindingId:
-          type: string
-        resource:
-          type: string
-        roles:
-          type: object
-          additionalProperties:
-            type: string
 
     ResourcesResponse:
       type: object
@@ -238,17 +280,30 @@ components:
         resources:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/Resource'
-
-    Resource:
-      type: object
-      properties:
-        resource:
-          type: string
-        roles:
-          type: object
-          additionalProperties:
-            type: string
+            type: object
+            properties:
+              resource:
+                type: string
+                example: "/books"
+              roles:
+                type: object
+                additionalProperties:
+                  type: string
+      example:
+        {
+          "resources": {
+            "/stores": {
+              "roles": {
+                "store.customer": ""
+              }
+            },
+            "/stores/brno": {
+              "roles": {
+                "store.cashier": ""
+              }
+            }
+          }
+        }
 
     RolesResponse:
       type: object
@@ -267,10 +322,12 @@ components:
           type: integer
         name:
           type: string
+          example: "books.admin"
         permissions:
           type: array
           items:
             type: string
+          example: ["books.read", "books.write"]
 
     AuthorizeRequest:
       type: object
