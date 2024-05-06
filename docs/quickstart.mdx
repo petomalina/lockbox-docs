@@ -10,7 +10,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 This guide will walk you through the basic steps of setting up an authorization system using AccessBox.
 
-## Step 1: Define Roles and Permissions
+## Step 1: Define Roles and their Permissions
 
 1. **Access the AccessBox UI and navigate to the "Roles" section.** 
 2. **Create two roles:**
@@ -19,24 +19,28 @@ This guide will walk you through the basic steps of setting up an authorization 
 
 <img src={useBaseUrl('/img/new-role.png')} width="600" />
 
-## Step 2: Create an API Key
+## Step 2: Tenant ID an API Key
 
 1. **Make note of your tenant ID**
+Tenant ID can be seen in your browser URL as query parameter `tenant=your_tenant_id`. Make note of this value.
     <img src={useBaseUrl('/img/tenant-location.png')} width="400" />
 
 2. **In the AccessBox UI, go to the "API Keys" section and create a new API key.**
+Once the API Key is created, copy it from the UI and make note of it. You will export it in the next step.
     <img src={useBaseUrl('/img/new-api-key.png')} width="600" />
 
 3. **Set these values as environment variables in your shell:**
 
 ```shell
-export ACCESSBOX_API_KEY="your_api_key"
 export ACCESSBOX_TENANT="your_tenant_id"
+export ACCESSBOX_API_KEY="your_api_key"
 ```
 
 ## Step 3: Create Bindings
 
-Bindings are a triad of an identity (defined by a string), a resource (also defined by a string), and a role. Resources are defined within a tree structure, e.g. `/projects/project-1`, where `/projects` is a collection and `project-1` is a specific object.
+Bindings are a triad of an identity (defined by a string), a resource (also defined by a string), and a role. Resources
+are defined within a folder-like structure. Creating a binding on a certain folder will apply that binding
+to all resources and subfolders recursively.
 
 <Tabs>
   <TabItem value="Console" label="Console" default>

@@ -12,21 +12,21 @@ belongs to an account (personal or organizational). Let's explore how AccessBox 
 
 ## Understanding the Resource Structure
 
-Resources are composed in a tree structure. In our Todolist tracker, the root resource is the account.
+Resources are composed in a folder-like structure. In our Todolist tracker, the root node is the account.
 Each account can have multiple projects. Each project can have multiple tasks and invoices. This tree structure 
 allows for granular control over the permissions without the need to define permissions for each individual resource.
 
 <img src={useBaseUrl('/img/resource-structure.png')} width="600" />
 
-In the example above, a path to e.g. Task-1 would be `/accounts/account-1/projects/project-1/tasks/task-1`. If you want to
-reference all projects, for the account, you can use `/accounts/account-1/projects`, etc.
+In the example above, a path to `Task-1` would be `/accounts/account-1/projects/project-1/tasks/Task-1`. If you want to
+reference all projects for the account in a binding, you can use `/accounts/account-1/projects`, etc.
 
 ## Roles & Permissions
 
-In AccessBox, roles are a collection of permissions. We define roles for different resources using flat strings
+In AccessBox, roles are a collection of permissions. We define roles for different resources using strings
 containing the resource name and the permission. For example, a role for an account owner might look like
 this: `accounts.owner`. For the projects, even though they are part of some account, we define such role as
-e.g. `projects.owner`. This allows us to bind the role to any resource in the resource tree.
+e.g. `projects.owner`. This allows us to bind the role to any node in the tree.
 
 Each role can have multiple permissions. For example, the `projects.owner` might look like this:
 - `projects.read`
